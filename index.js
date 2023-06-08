@@ -31,6 +31,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/popularClasses', async(req, res)=>{
+      const classes = await sportsCollection.find().sort({studentsEnrolled : -1}).limit(6).toArray()
+      res.send(classes)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
