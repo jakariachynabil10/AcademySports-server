@@ -96,18 +96,40 @@ async function run() {
     app.get("/addClass", verifyJWT, verifyInstructor, async (req, res) => {
       let query = {};
       if (req.query?.email) {
-        query = { instructorEmail: req.query.email,  };
+        query = { instructorEmail: req.query.email };
       }
       const result = await sportsCollection.find(query).toArray();
       res.send(result);
     });
 
+    app.get("/manageClasses", verifyJWT,verifyAdmin,  async (req, res) => {
+      const role = "instructor"; // Role to filter by
+      const query = { role: role };
+      const instructors = await UserCollection.find(query).toArray();
+      for (const l of instructors) { 
+        const queryEmail = {instructorEmail : l.email}
+        const result = await sportsCollection.find(queryEmail).toArray()
+       res.send(result)
+      }   
+    });
+    
 
-    app.post('/addClass', verifyJWT, verifyInstructor, async (req, res) => {
+    app.patch("/updateStatus",  async (req, res) => {
+    const updateQuery = {_id : new ObjectId(req.query.id)}
+    const updateDoc = {
+      $set:{
+        status : req.query.status,
+      }
+    }
+    const updatedDoc = await sportsCollection.updateOne(updateQuery,updateDoc)
+    res.send(updatedDoc)
+    });
+
+    app.post("/addClass", verifyJWT, verifyInstructor, async (req, res) => {
       const newItem = req.body;
-      const result = await sportsCollection.insertOne(newItem)
+      const result = await sportsCollection.insertOne(newItem);
       res.send(result);
-    })
+    });
 
     app.get("/popularClasses", async (req, res) => {
       const classes = await sportsCollection
@@ -196,7 +218,7 @@ async function run() {
       const user = await UserCollection.findOne(query);
 
       if (user.hasOwnProperty("role")) {
-        return res.send({admin : false})
+        return res.send({ admin: false });
       }
 
       if (!user.hasOwnProperty("role")) {
@@ -260,12 +282,12 @@ async function run() {
 
     app.post("/payment", async (req, res) => {
       const payments = req.body;
-    
+
       const insertResult = await paymentsCollection.insertOne(payments);
       const query = {
         _id: { $in: payments.cartItems.map((id) => new ObjectId(id)) },
       };
-   
+
       const deletedResult = await cartsCollection.deleteMany(query);
 
       // for (const i of payments.classItems) {
@@ -291,18 +313,13 @@ async function run() {
           },
         };
         const result = await sportsCollection.updateOne(filter, updateDoc);
-        console.log(result);
       }
 
-      
-      
-        // const updateDoc = {
-        //   $set : {
-        //     totalEnrolledStudents : +1
-        //   }
-        // }
-      
-
+      // const updateDoc = {
+      //   $set : {
+      //     totalEnrolledStudents : +1
+      //   }
+      // }
 
       // const enrolledClasses = payments.cartItems.map((id) => ({
       //   ItemId: id,
@@ -313,12 +330,8 @@ async function run() {
       // const enrollResults = payments.cartItems.map(id =>  `ObjectId('${id}')`)
       // console.log(enrollResults)
       // const enrolledClassess = await sportsCollection.find({_id : {$in : enrollResults}}).toArray()
-      res.send({ insertResult, deletedResult});
+      res.send({ insertResult, deletedResult });
     });
-
-    
-
-    
 
     // TODO : need to work
     // app.get("/enrolledCls/:id", async (req, res) => {
@@ -337,7 +350,7 @@ async function run() {
     //   const enrolledClass = await enrolledClassCollection.insertMany(matchItem)
 
     //   res.send(enrolledClass)
-     
+
     // });
 
     // Send a ping to confirm a successful connection
