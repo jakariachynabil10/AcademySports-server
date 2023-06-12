@@ -46,7 +46,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const sportsCollection = client.db("SportsDB").collection("sportsAcademy");
     const UserCollection = client.db("SportsDB").collection("user");
@@ -334,7 +334,7 @@ async function run() {
     });
 
     app.get('/payment', verifyJWT, async(req, res)=>{
-      const result = await paymentsCollection.find().toArray()
+      const result = await paymentsCollection.find().sort({date : -1}).toArray()
       res.send(result)
     })
 
