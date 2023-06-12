@@ -254,11 +254,11 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/carts", async (req, res) => {
-      const items = req.body;
-      const carts = await cartsCollection.insertOne(items);
-      res.send(carts);
-    });
+    // app.post("/carts", async (req, res) => {
+    //   const items = req.body;
+    //   const carts = await cartsCollection.insertOne(items);
+    //   res.send(carts);
+    // });
 
     app.delete("/carts/:id", async (req, res) => {
       const id = req.params.id;
