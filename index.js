@@ -208,25 +208,25 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/users/students/:email", verifyJWT, async (req, res) => {
-    //   const email = req.params.email;
-    //   if (req.decoded.email !== email) {
-    //     return res.send({ admin: false });
-    //   }
+    app.get("/users/students/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      if (req.decoded.email !== email) {
+        return res.send({ admin: false });
+      }
 
-    //   const query = { email: email };
-    //   const user = await UserCollection.findOne(query);
+      const query = { email: email };
+      const user = await UserCollection.findOne(query);
 
-    //   if (user.hasOwnProperty("role")) {
-    //     return res.send({ admin: false });
-    //   }
+      if (user.hasOwnProperty("role")) {
+        return res.send({ admin: false });
+      }
 
-    //   if (!user.hasOwnProperty("role")) {
-    //     return res.send({ admin: true });
-    //   }
+      if (!user.hasOwnProperty("role")) {
+        return res.send({ admin: true });
+      }
 
-    //   res.send(user);
-    // });
+      res.send(user);
+    });
 
     app.delete("/users/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
