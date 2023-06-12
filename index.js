@@ -114,7 +114,7 @@ async function run() {
     });
     
 
-    app.patch("/updateStatus",  async (req, res) => {
+    app.patch("/updateStatus", verifyJWT,verifyAdmin, async (req, res) => {
     const updateQuery = {_id : new ObjectId(req.query.id)}
     const updateDoc = {
       $set:{
@@ -145,7 +145,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/users", async (req, res) => {
+    app.post("/users",  async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
       const existingUser = await UserCollection.findOne(query);
@@ -158,7 +158,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/users/admin/:email", verifyJWT, async (req, res) => {
+    app.get("/users/admin/:email", verifyJWT,  async (req, res) => {
       const email = req.params.email;
 
       if (req.decoded.email !== email) {
@@ -171,7 +171,7 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/users/admin/:id", async (req, res) => {
+    app.patch("/users/admin/:id", verifyJWT,  async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -183,7 +183,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
+    app.get("/users/instructor/:email", verifyJWT,  async (req, res) => {
       const email = req.params.email;
 
       if (req.decoded.email !== email) {
@@ -196,7 +196,7 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/users/instructor/:id", async (req, res) => {
+    app.patch("/users/instructor/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
@@ -228,7 +228,7 @@ async function run() {
       res.send(user);
     });
 
-    app.delete("/users/:id", async (req, res) => {
+    app.delete("/users/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await UserCollection.deleteOne(query);
@@ -332,6 +332,11 @@ async function run() {
       // const enrolledClassess = await sportsCollection.find({_id : {$in : enrollResults}}).toArray()
       res.send({ insertResult, deletedResult });
     });
+
+    app.get('/payment', verifyJWT, async(req, res)=>{
+      const result = await paymentsCollection.find().toArray()
+      res.send(result)
+    })
 
     // TODO : need to work
     // app.get("/enrolledCls/:id", async (req, res) => {
